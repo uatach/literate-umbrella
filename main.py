@@ -44,6 +44,19 @@ def synthesize(
     )
 
 
+def delay(buffer: np.ndarray, duration: float, rate: int) -> np.ndarray:
+    zeros = np.zeros(samples(duration, rate))
+    return np.concatenate((zeros, buffer))
+
+
+def overlay(sounds: list[np.ndarray]) -> np.ndarray:
+    size = max(len(x) for x in sounds)
+    buffer = np.zeros(size)
+    for x in sounds:
+        buffer[: len(x)] += x
+    return normalize(buffer)
+
+
 def play(buffer: np.ndarray, volume: float, rate: int):
     data = (volume * buffer.astype(np.float32)).tobytes()
 
@@ -80,3 +93,45 @@ frequencies = [
 for freq in frequencies:
     buffer = synthesize(duration, freq, rate, damping)
     play(buffer, volume, rate)
+
+
+duration = 3.5
+damping = 0.499
+
+frequencies = [
+    329.63,
+    246.94,
+    196.00,
+    146.83,
+    110.00,
+    82.41,
+]
+
+buffer = overlay(
+    [
+        delay(
+            synthesize(duration + 0.25 * i, x, rate, damping),
+            duration=i * 0.04,
+            rate=rate,
+        )
+        for i, x in enumerate(frequencies)
+    ]
+)
+
+play(buffer, volume, rate)
+
+
+frequencies = list(reversed(frequencies))
+
+buffer = overlay(
+    [
+        delay(
+            synthesize(duration + 0.25 * i, x, rate, damping),
+            duration=i * 0.04,
+            rate=rate,
+        )
+        for i, x in enumerate(frequencies)
+    ]
+)
+
+play(buffer, volume, rate)
