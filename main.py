@@ -4,22 +4,20 @@ import pyaudio as pa
 from itertools import cycle
 
 
-volume = .6
-duration = .5
-rate = 44100
-damping = .495
-
-samples = round(duration * rate)
-
 rng = np.random.default_rng()
 
 
-def normalize(samples):
-    aux = samples - samples.mean()
-    return aux / max(np.abs(aux))
+def samples(duration: float, rate: int) -> int:
+    return round(duration * rate)
 
 
-def vibrate(buffer):
+def normalize(buffer: np.ndarray) -> np.ndarray:
+    buffer -= buffer.mean()
+    return buffer / max(np.abs(buffer))
+
+
+def vibrate(buffer: np.ndarray, damping: float) -> list[float]:
+    buffer = buffer.copy()
     size = len(buffer)
 
     for i in cycle(range(size)):
@@ -28,19 +26,25 @@ def vibrate(buffer):
         buffer[i] = (c + n) * damping
 
 
-def synthesize(freq):
+def synthesize(
+    duration: float,
+    freq: float,
+    rate: int,
+    damping: float = 0.5,
+) -> np.ndarray:
     size = round(rate / freq)
     buffer = rng.uniform(-1, 1, size)
+
     return normalize(
         np.fromiter(
-            vibrate(buffer),
+            vibrate(buffer, damping),
             np.float64,
-            samples,
+            samples(duration, rate),
         )
     )
 
 
-def play(buffer, volume=volume, rate=rate):
+def play(buffer: np.ndarray, volume: float, rate: int):
     data = (volume * buffer.astype(np.float32)).tobytes()
 
     audio = pa.PyAudio()
@@ -56,6 +60,12 @@ def play(buffer, volume=volume, rate=rate):
     audio.terminate()
 
 
+volume = 0.5
+rate = 44100
+
+duration = 0.5
+damping = 0.495
+
 frequencies = [
     261.63,
     293.66,
@@ -68,5 +78,5 @@ frequencies = [
 ]
 
 for freq in frequencies:
-    buffer = synthesize(freq)
-    play(buffer, volume)
+    buffer = synthesize(duration, freq, rate, damping)
+    play(buffer, volume, rate)
