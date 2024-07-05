@@ -1,8 +1,12 @@
 import numpy as np
 import pyaudio as pa
 
+from re import fullmatch
 from itertools import cycle
 
+
+rate = 88200
+volume = 0.5
 
 audio = pa.PyAudio()
 rng = np.random.default_rng()
@@ -16,8 +20,22 @@ def change_pitch(freq: float, semitones: int) -> float:
     return freq * 2 ** (semitones / 12)
 
 
+def parse_pitch(notation):
+    if match := fullmatch(r"([A-G]#?)(-?\d+)?", notation):
+        note = match.group(1)
+        octave = int(match.group(2) or 0)
+        semitones = "C C# D D# E F F# G G# A A# B".split()
+        index = octave * 12 + semitones.index(note) - 57
+        return 440.0 * 2 ** (index / 12)
+    else:
+        raise ValueError
+
+
+def centralize(buffer: np.ndarray) -> np.ndarray:
+    return buffer - buffer.mean()
+
+
 def normalize(buffer: np.ndarray) -> np.ndarray:
-    buffer -= buffer.mean()
     return buffer / max(np.abs(buffer))
 
 
@@ -37,14 +55,16 @@ def synthesize(
     rate: int,
     damping: float,
 ) -> np.ndarray:
-    size = round(rate / freq) # unit here is samples per cycle
+    size = round(rate / freq)  # unit here is samples per cycle
     buffer = rng.uniform(-1, 1, size)
 
     return normalize(
-        np.fromiter(
-            vibrate(buffer, damping),
-            np.float64,
-            samples(duration, rate),
+        centralize(
+            np.fromiter(
+                vibrate(buffer, damping),
+                np.float64,
+                samples(duration, rate),
+            )
         )
     )
 
@@ -74,6 +94,12 @@ def play(buffer: np.ndarray, volume: float, rate: int):
 
     stream.write(data)
     stream.close()
+
+
+def play_note(note, duration, rate, damping, volume):
+    freq = parse_pitch(note)
+    buffer = synthesize(duration, freq, rate, damping)
+    play(buffer, volume, rate)
 
 
 def play_sequence():
@@ -160,13 +186,20 @@ def play_pitches():
         play(buffer, volume, rate)
 
 
-volume = 0.5
-rate = 88200
+def play_notations():
+    duration = 1.1
+    damping = 0.495
+
+    for note in "C", "C0", "A#", "C#4", "A4":
+        play_note(note, duration, rate, damping, volume)
+
+    for note in "E4", "B3", "G3", "D3", "A2", "E2":
+        play_note(note, duration, rate, damping, volume)
 
 
 play_sequence()
 play_chord()
 play_chord_reversed()
 play_pitches()
-
+play_notations()
 audio.terminate()
