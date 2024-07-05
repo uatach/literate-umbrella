@@ -4,6 +4,7 @@ import pyaudio as pa
 from itertools import cycle
 
 
+audio = pa.PyAudio()
 rng = np.random.default_rng()
 
 
@@ -30,9 +31,9 @@ def synthesize(
     duration: float,
     freq: float,
     rate: int,
-    damping: float = 0.5,
+    damping: float,
 ) -> np.ndarray:
-    size = round(rate / freq)
+    size = round(rate / freq) # unit here is samples per cycle
     buffer = rng.uniform(-1, 1, size)
 
     return normalize(
@@ -60,7 +61,6 @@ def overlay(sounds: list[np.ndarray]) -> np.ndarray:
 def play(buffer: np.ndarray, volume: float, rate: int):
     data = (volume * buffer.astype(np.float32)).tobytes()
 
-    audio = pa.PyAudio()
     stream = audio.open(
         rate=rate,
         channels=1,
@@ -70,68 +70,80 @@ def play(buffer: np.ndarray, volume: float, rate: int):
 
     stream.write(data)
     stream.close()
-    audio.terminate()
 
 
-volume = 0.5
-rate = 44100
+def play_sequence():
+    duration = 0.5
+    damping = 0.495
 
-duration = 0.5
-damping = 0.495
+    frequencies = [
+        261.63,
+        293.66,
+        329.63,
+        349.23,
+        392.00,
+        440.00,
+        493.88,
+        523.25,
+    ]
 
-frequencies = [
-    261.63,
-    293.66,
-    329.63,
-    349.23,
-    392.00,
-    440.00,
-    493.88,
-    523.25,
-]
+    for freq in frequencies:
+        buffer = synthesize(duration, freq, rate, damping)
+        play(buffer, volume, rate)
 
-for freq in frequencies:
-    buffer = synthesize(duration, freq, rate, damping)
+
+def play_chord():
+    duration = 3.5
+    damping = 0.499
+
+    frequencies = [
+        329.63,
+        246.94,
+        196.00,
+        146.83,
+        110.00,
+        82.41,
+    ]
+
+    buffer = overlay(
+        [
+            delay(
+                synthesize(duration + 0.25 * i, x, rate, damping),
+                duration=i * 0.1,
+                rate=rate,
+            )
+            for i, x in enumerate(frequencies)
+        ]
+    )
+
     play(buffer, volume, rate)
 
 
-duration = 3.5
-damping = 0.499
+def play_chord_reversed():
+    duration = 3.5
+    damping = 0.499
 
-frequencies = [
-    329.63,
-    246.94,
-    196.00,
-    146.83,
-    110.00,
-    82.41,
-]
-
-buffer = overlay(
-    [
-        delay(
-            synthesize(duration + 0.25 * i, x, rate, damping),
-            duration=i * 0.04,
-            rate=rate,
-        )
-        for i, x in enumerate(frequencies)
+    frequencies = [
+        329.63,
+        246.94,
+        196.00,
+        146.83,
+        110.00,
+        82.41,
     ]
-)
 
-play(buffer, volume, rate)
+    buffer = overlay(
+        [
+            delay(
+                synthesize(duration + 0.25 * i, x, rate, damping),
+                duration=(len(frequencies) - 1 - i) * 0.1,
+                rate=rate,
+            )
+            for i, x in enumerate(frequencies)
+        ]
+    )
+
+    play(buffer, volume, rate)
 
 
-frequencies = list(reversed(frequencies))
-
-buffer = overlay(
-    [
-        delay(
-            synthesize(duration + 0.25 * i, x, rate, damping),
-            duration=i * 0.04,
-            rate=rate,
-        )
-        for i, x in enumerate(frequencies)
-    ]
-)
-
-play(buffer, volume, rate)
+audio.terminate()
