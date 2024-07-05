@@ -12,6 +12,10 @@ def samples(duration: float, rate: int) -> int:
     return round(duration * rate)
 
 
+def change_pitch(freq: float, semitones: int) -> float:
+    return freq * 2 ** (semitones / 12)
+
+
 def normalize(buffer: np.ndarray) -> np.ndarray:
     buffer -= buffer.mean()
     return buffer / max(np.abs(buffer))
@@ -145,5 +149,24 @@ def play_chord_reversed():
 
     play(buffer, volume, rate)
 
+
+def play_pitches():
+    duration = 0.5
+    damping = 0.495
+
+    for x in sorted([-12, 12, 24] + list(range(12))):
+        freq = change_pitch(110, x)
+        buffer = synthesize(duration, freq, rate, damping=damping)
+        play(buffer, volume, rate)
+
+
+volume = 0.5
+rate = 88200
+
+
+play_sequence()
+play_chord()
+play_chord_reversed()
+play_pitches()
 
 audio.terminate()
