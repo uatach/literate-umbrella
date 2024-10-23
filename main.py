@@ -8,7 +8,6 @@ from itertools import cycle
 rate = 88200
 volume = 0.5
 
-audio = pa.PyAudio()
 rng = np.random.default_rng()
 
 
@@ -82,7 +81,7 @@ def overlay(sounds: list[np.ndarray]) -> np.ndarray:
     return normalize(buffer)
 
 
-def play(buffer: np.ndarray, volume: float, rate: int):
+def play(audio: pa.PyAudio, buffer: np.ndarray, volume: float, rate: int):
     data = (volume * buffer.astype(np.float32)).tobytes()
 
     stream = audio.open(
@@ -96,13 +95,7 @@ def play(buffer: np.ndarray, volume: float, rate: int):
     stream.close()
 
 
-def play_note(note, duration, rate, damping, volume):
-    freq = parse_pitch(note)
-    buffer = synthesize(duration, freq, rate, damping)
-    play(buffer, volume, rate)
-
-
-def play_sequence():
+def play_sequence(audio):
     duration = 0.5
     damping = 0.495
 
@@ -119,10 +112,10 @@ def play_sequence():
 
     for freq in frequencies:
         buffer = synthesize(duration, freq, rate, damping)
-        play(buffer, volume, rate)
+        play(audio, buffer, volume, rate)
 
 
-def play_chord():
+def play_chord(audio):
     duration = 3.5
     damping = 0.499
 
@@ -146,10 +139,10 @@ def play_chord():
         ]
     )
 
-    play(buffer, volume, rate)
+    play(audio, buffer, volume, rate)
 
 
-def play_chord_reversed():
+def play_chord_reversed(audio):
     duration = 3.5
     damping = 0.499
 
@@ -173,33 +166,47 @@ def play_chord_reversed():
         ]
     )
 
-    play(buffer, volume, rate)
+    play(audio, buffer, volume, rate)
 
 
-def play_pitches():
+def play_pitches(audio):
     duration = 0.5
     damping = 0.495
 
     for x in sorted([-12, 12, 24] + list(range(12))):
         freq = change_pitch(110, x)
         buffer = synthesize(duration, freq, rate, damping=damping)
-        play(buffer, volume, rate)
+        play(audio, buffer, volume, rate)
 
 
-def play_notations():
+def play_note(audio, note, duration, rate, damping, volume):
+    freq = parse_pitch(note)
+    buffer = synthesize(duration, freq, rate, damping)
+    play(audio, buffer, volume, rate)
+
+
+def play_notations(audio):
     duration = 1.1
     damping = 0.495
 
     for note in "C", "C0", "A#", "C#4", "A4":
-        play_note(note, duration, rate, damping, volume)
+        play_note(audio, note, duration, rate, damping, volume)
 
     for note in "E4", "B3", "G3", "D3", "A2", "E2":
-        play_note(note, duration, rate, damping, volume)
+        play_note(audio, note, duration, rate, damping, volume)
 
 
-play_sequence()
-play_chord()
-play_chord_reversed()
-play_pitches()
-play_notations()
-audio.terminate()
+def main():
+    audio = pa.PyAudio()
+
+    play_sequence(audio)
+    play_chord(audio)
+    play_chord_reversed(audio)
+    play_pitches(audio)
+    play_notations(audio)
+
+    audio.terminate()
+
+
+main()
+
