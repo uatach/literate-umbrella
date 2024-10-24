@@ -3,31 +3,16 @@ import pyaudio as pa
 
 from re import fullmatch
 from itertools import cycle
+from typing import Generator
 
 
-rate = 88200
-volume = 0.5
+volume = 0.3
 
 rng = np.random.default_rng()
 
 
-def samples(duration: float, rate: int) -> int:
+def get_sampling_size(duration: float, rate: int) -> int:
     return round(duration * rate)
-
-
-def change_pitch(freq: float, semitones: int) -> float:
-    return freq * 2 ** (semitones / 12)
-
-
-def parse_pitch(notation):
-    if match := fullmatch(r"([A-G]#?)(-?\d+)?", notation):
-        note = match.group(1)
-        octave = int(match.group(2) or 0)
-        semitones = "C C# D D# E F F# G G# A A# B".split()
-        index = octave * 12 + semitones.index(note) - 57
-        return 440.0 * 2 ** (index / 12)
-    else:
-        raise ValueError
 
 
 def centralize(buffer: np.ndarray) -> np.ndarray:
@@ -38,7 +23,7 @@ def normalize(buffer: np.ndarray) -> np.ndarray:
     return buffer / max(np.abs(buffer))
 
 
-def vibrate(buffer: np.ndarray, damping: float) -> list[float]:
+def vibrate(buffer: np.ndarray, damping: float) -> Generator[float, None, None]:
     buffer = buffer.copy()
     size = len(buffer)
 
@@ -57,19 +42,17 @@ def synthesize(
     size = round(rate / freq)  # unit here is samples per cycle
     buffer = rng.uniform(-1, 1, size)
 
-    return normalize(
-        centralize(
-            np.fromiter(
-                vibrate(buffer, damping),
-                np.float64,
-                samples(duration, rate),
-            )
-        )
+    samples = np.fromiter(
+        vibrate(buffer, damping),
+        np.float64,
+        get_sampling_size(duration, rate),
     )
+
+    return normalize(centralize(samples))
 
 
 def delay(buffer: np.ndarray, duration: float, rate: int) -> np.ndarray:
-    zeros = np.zeros(samples(duration, rate))
+    zeros = np.zeros(get_sampling_size(duration, rate))
     return np.concatenate((zeros, buffer))
 
 
@@ -95,7 +78,7 @@ def play(audio: pa.PyAudio, buffer: np.ndarray, volume: float, rate: int):
     stream.close()
 
 
-def play_sequence(audio):
+def play_sequence(audio, rate):
     duration = 0.5
     damping = 0.495
 
@@ -115,7 +98,7 @@ def play_sequence(audio):
         play(audio, buffer, volume, rate)
 
 
-def play_chord(audio):
+def play_chord(audio, rate):
     duration = 3.5
     damping = 0.499
 
@@ -142,7 +125,7 @@ def play_chord(audio):
     play(audio, buffer, volume, rate)
 
 
-def play_chord_reversed(audio):
+def play_chord_reversed(audio, rate):
     duration = 3.5
     damping = 0.499
 
@@ -169,7 +152,22 @@ def play_chord_reversed(audio):
     play(audio, buffer, volume, rate)
 
 
-def play_pitches(audio):
+def change_pitch(freq: float, semitones: int) -> float:
+    return freq * 2 ** (semitones / 12)
+
+
+def parse_pitch(notation) -> float:
+    if match := fullmatch(r"([A-G]#?)(-?\d+)?", notation):
+        note = match.group(1)
+        octave = int(match.group(2) or 0)
+        semitones = "C C# D D# E F F# G G# A A# B".split()
+        index = octave * 12 + semitones.index(note) - 57
+        return 440.0 * 2 ** (index / 12)
+    else:
+        raise ValueError
+
+
+def play_pitches(audio, rate):
     duration = 0.5
     damping = 0.495
 
@@ -185,7 +183,7 @@ def play_note(audio, note, duration, rate, damping, volume):
     play(audio, buffer, volume, rate)
 
 
-def play_notations(audio):
+def play_notations(audio, rate):
     duration = 1.1
     damping = 0.495
 
@@ -198,12 +196,13 @@ def play_notations(audio):
 
 def main():
     audio = pa.PyAudio()
+    rate = 44100  # 88200
 
-    play_sequence(audio)
-    play_chord(audio)
-    play_chord_reversed(audio)
-    play_pitches(audio)
-    play_notations(audio)
+    play_sequence(audio, rate)
+    play_chord(audio, rate)
+    play_chord_reversed(audio, rate)
+    play_pitches(audio, rate)
+    play_notations(audio, rate)
 
     audio.terminate()
 
