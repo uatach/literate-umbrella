@@ -78,6 +78,26 @@ def play(audio: pa.PyAudio, buffer: np.ndarray, volume: float, rate: int):
     stream.close()
 
 
+def play_tone(audio, rate):
+    duration = 0.5
+    damping = 0.495
+    freq = 441
+
+    buffer = synthesize(duration, freq, rate, damping)
+    play(audio, buffer, volume, rate)
+
+
+def play_tones(audio, rate):
+    duration = 1
+    damping = 0.495
+
+    frequencies = np.arange(200, 610, 10)
+
+    for freq in frequencies:
+        buffer = synthesize(duration, freq, rate, damping)
+        play(audio, buffer, volume, rate)
+
+
 def play_sequence(audio, rate):
     duration = 0.5
     damping = 0.495
@@ -115,7 +135,7 @@ def play_chord(audio, rate):
         [
             delay(
                 synthesize(duration + 0.25 * i, x, rate, damping),
-                duration=i * 0.1,
+                duration=0.04 * i,
                 rate=rate,
             )
             for i, x in enumerate(frequencies)
@@ -142,7 +162,7 @@ def play_chord_reversed(audio, rate):
         [
             delay(
                 synthesize(duration + 0.25 * i, x, rate, damping),
-                duration=(len(frequencies) - 1 - i) * 0.1,
+                duration=0.04 * (len(frequencies) - 1 - i),
                 rate=rate,
             )
             for i, x in enumerate(frequencies)
@@ -198,6 +218,8 @@ def main():
     audio = pa.PyAudio()
     rate = 44100  # 88200
 
+    play_tone(audio, rate)
+    play_tones(audio, rate)
     play_sequence(audio, rate)
     play_chord(audio, rate)
     play_chord_reversed(audio, rate)
