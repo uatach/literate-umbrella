@@ -2,70 +2,13 @@ import numpy as np
 import pyaudio as pa
 
 from re import fullmatch
-from typing import Generator
-from functools import cache
-from itertools import cycle
+
+import utils
 
 from models import load
 
 
 volume = 0.1
-
-rng = np.random.default_rng()
-
-
-def get_sampling_size(duration: float, rate: int) -> int:
-    return round(duration * rate)
-
-
-def centralize(buffer: np.ndarray) -> np.ndarray:
-    return buffer - buffer.mean()
-
-
-def normalize(buffer: np.ndarray) -> np.ndarray:
-    return buffer / max(np.abs(buffer))
-
-
-def vibrate(buffer: np.ndarray, damping: float) -> Generator[float, None, None]:
-    buffer = buffer.copy()
-    size = len(buffer)
-
-    for i in cycle(range(size)):
-        yield (c := buffer[i])
-        n = buffer[(i + 1) % size]
-        buffer[i] = (c + n) * damping
-
-
-@cache
-def synthesize(
-    duration: float,
-    freq: float,
-    rate: int,
-    damping: float,
-) -> np.ndarray:
-    size = round(rate / freq)  # unit here is samples per cycle
-    buffer = rng.uniform(-1, 1, size)
-
-    samples = np.fromiter(
-        vibrate(buffer, damping),
-        np.float64,
-        get_sampling_size(duration, rate),
-    )
-
-    return normalize(centralize(samples))
-
-
-def delay(buffer: np.ndarray, duration: float, rate: int) -> np.ndarray:
-    zeros = np.zeros(get_sampling_size(duration, rate))
-    return np.concatenate((zeros, buffer))
-
-
-def overlay(sounds: list[np.ndarray]) -> np.ndarray:
-    size = max(len(x) for x in sounds)
-    buffer = np.zeros(size)
-    for x in sounds:
-        buffer[: len(x)] += x
-    return normalize(buffer)
 
 
 def play(audio: pa.PyAudio, buffer: np.ndarray, volume: float, rate: int):
@@ -82,13 +25,20 @@ def play(audio: pa.PyAudio, buffer: np.ndarray, volume: float, rate: int):
     stream.close()
 
 
+def play_frequency(audio, frequency, duration, rate, damping):
+    play(
+        audio,
+        utils.synthesize(frequency, duration, rate, damping),
+        volume,
+        rate,
+    )
+
+
 def play_tone(audio, rate):
     duration = 0.5
     damping = 0.495
-    freq = 441
-
-    buffer = synthesize(duration, freq, rate, damping)
-    play(audio, buffer, volume, rate)
+    frequency = 441
+    play_frequency(audio, frequency, duration, rate, damping)
 
 
 def play_tones(audio, rate):
@@ -97,9 +47,8 @@ def play_tones(audio, rate):
 
     frequencies = np.arange(200, 610, 10)
 
-    for freq in frequencies:
-        buffer = synthesize(duration, freq, rate, damping)
-        play(audio, buffer, volume, rate)
+    for x in frequencies:
+        play_frequency(audio, x, duration, rate, damping)
 
 
 def play_sequence(audio, rate):
@@ -117,9 +66,8 @@ def play_sequence(audio, rate):
         523.25,
     ]
 
-    for freq in frequencies:
-        buffer = synthesize(duration, freq, rate, damping)
-        play(audio, buffer, volume, rate)
+    for x in frequencies:
+        play_frequency(audio, x, duration, rate, damping)
 
 
 def play_chord(audio, rate):
@@ -135,10 +83,10 @@ def play_chord(audio, rate):
         82.41,
     ]
 
-    buffer = overlay(
+    buffer = utils.overlay(
         [
-            delay(
-                synthesize(duration + 0.25 * i, x, rate, damping),
+            utils.delay(
+                utils.synthesize(x, duration + 0.25 * i, rate, damping),
                 duration=0.04 * i,
                 rate=rate,
             )
@@ -162,10 +110,10 @@ def play_chord_reversed(audio, rate):
         82.41,
     ]
 
-    buffer = overlay(
+    buffer = utils.overlay(
         [
-            delay(
-                synthesize(duration + 0.25 * i, x, rate, damping),
+            utils.delay(
+                utils.synthesize(x, duration + 0.25 * i, rate, damping),
                 duration=0.04 * (len(frequencies) - 1 - i),
                 rate=rate,
             )
@@ -197,14 +145,12 @@ def play_pitches(audio, rate):
 
     for x in sorted([-12, 12, 24] + list(range(12))):
         freq = change_pitch(110, x)
-        buffer = synthesize(duration, freq, rate, damping=damping)
-        play(audio, buffer, volume, rate)
+        play_frequency(audio, freq, duration, rate, damping)
 
 
 def play_note(audio, note, duration, rate, damping, volume):
     freq = parse_pitch(note)
-    buffer = synthesize(duration, freq, rate, damping)
-    play(audio, buffer, volume, rate)
+    play_frequency(audio, freq, duration, rate, damping)
 
 
 def play_notations(audio, rate):
@@ -224,15 +170,15 @@ def play_notations(audio, rate):
 def build_chord(rate, duration, damping, freqs, speed, reverse):
     # TODO: improve duration should be longer for lower frequencies
     sounds = [
-        synthesize(duration + 0.25 * i, x, rate, damping)
+        utils.synthesize(x, duration + 0.25 * i, rate, damping)
         for i, x in enumerate(freqs)
     ]
 
     if reverse:
         sounds = reversed(sounds)
 
-    return normalize(overlay([
-        delay(x, i * speed, rate)
+    return utils.normalize(utils.overlay([
+        utils.delay(x, i * speed, rate)
         for i, x in enumerate(sounds)
     ]))
 
