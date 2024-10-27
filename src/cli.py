@@ -1,6 +1,6 @@
 import click
 
-from audio import AudioHandler, play_frequency
+from audio import AudioHandler, play_frequency, play_overlay
 
 
 @click.group
@@ -46,6 +46,32 @@ def play_sequence(ctx, **kwargs):
             **kwargs,
             frequency=x,
         )
+
+
+@main.command
+@click.pass_context
+@click.option("--duration", default=5)
+@click.option("--damping", default=0.499)
+@click.option("--speed", default=0.04)
+@click.option("--reverse", default=False)
+def play_chord(ctx, **kwargs):
+    frequencies = [
+        329.63,
+        246.94,
+        196.00,
+        146.83,
+        110.00,
+        82.41,
+    ]
+
+    if kwargs.pop("reverse"):
+        frequencies = list(reversed(frequencies))
+
+    play_overlay(
+        **ctx.obj,
+        **kwargs,
+        frequencies=frequencies,
+    )
 
 
 if __name__ == "__main__":

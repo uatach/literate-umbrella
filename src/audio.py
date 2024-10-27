@@ -60,3 +60,31 @@ def play_frequency(
         volume,
         rate,
     )
+
+
+def play_overlay(
+    handler: AudioHandler,
+    frequencies: list[float],
+    duration: float,
+    damping: float,
+    volume: float,
+    speed: float,
+    rate: int,
+):
+    buffer = utils.overlay(
+        [
+            utils.delay(
+                utils.synthesize(x, duration, rate, damping),
+                duration=speed * i,
+                rate=rate,
+            )
+            for i, x in enumerate(frequencies)
+        ]
+    )
+
+    play(
+        handler,
+        buffer,
+        volume,
+        rate,
+    )
