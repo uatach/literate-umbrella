@@ -1,10 +1,17 @@
 from yaml import safe_load
+from typing import Optional
 from pathlib import Path
 from pydantic import BaseModel
 
 
+class Note(BaseModel):
+    frets: list[Optional[int]]
+    arpeggio: float
+    stroke: str
+
+
 class Measure(BaseModel):
-    notes: list[dict]
+    notes: list[Note]
 
 
 class Tablature(BaseModel):
@@ -13,7 +20,7 @@ class Tablature(BaseModel):
     bars: list[Measure]
 
 
-class Track(BaseModel):
+class Instrument(BaseModel):
     tuning: list[str]
     vibration: float
     damping: float
@@ -24,7 +31,7 @@ class Song(BaseModel):
     title: str
     artist: str
     rate: int
-    tracks: dict[str, Track]
+    tracks: dict[str, Instrument]
 
 
 def load(path: str):

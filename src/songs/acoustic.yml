@@ -1,0 +1,95 @@
+title: Acoustic Guitar Tests
+artist: None
+rate: 44100
+tracks:
+  instrument:
+    references:
+      - https://realpython.com/python-guitar-synthesizer
+    tuning: [E2, A2, D3, G3, B3, E4]
+    vibration: 1
+    damping: 0.498
+    tabs:
+      bpm: 75
+      signature: 4/4
+      bars:
+        - notes:
+            - frets: [0, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [1, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [2, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [3, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [4, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [5, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [6, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [7, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [8, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [9, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [10, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [11, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [12, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [13, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [14, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [15, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [16, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [17, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [18, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [19, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [20, ~, ~, ~, ~, ~]
+              arpeggio: 0.04
+              stroke: down
+        - notes:
+            - frets: [~, ~, 2, ~, 0, ~]
+              arpeggio: 0.04
+              stroke: down
+        - notes:
+            - frets: [0, 0, 0, 0, 0, 0]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [0, 0, 0, 0, 0, 0]
+              arpeggio: 0.04
+              stroke: up
+            - frets: [0, 1, 0, 3, 0, 7]
+              arpeggio: 0.04
+              stroke: down
+            - frets: [0, 1, 0, 3, 0, 7]
+              arpeggio: 0.04
+              stroke: up

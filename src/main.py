@@ -6,6 +6,8 @@ from typing import Generator
 from functools import cache
 from itertools import cycle
 
+from models import load
+
 
 volume = 0.1
 
@@ -215,10 +217,56 @@ def play_notations(audio, rate):
     for note in "E4", "B3", "G3", "D3", "A2", "E2":
         play_note(audio, note, duration, rate, damping, volume)
 
+    for note in "G2", "D2", "A1", "E1":
+        play_note(audio, note, duration, rate, damping, volume)
+
+
+def build_chord(rate, duration, damping, freqs, speed, reverse):
+    # TODO: improve duration should be longer for lower frequencies
+    sounds = [
+        synthesize(duration + 0.25 * i, x, rate, damping)
+        for i, x in enumerate(freqs)
+    ]
+
+    if reverse:
+        sounds = reversed(sounds)
+
+    return normalize(overlay([
+        delay(x, i * speed, rate)
+        for i, x in enumerate(sounds)
+    ]))
+
+
+def play_acoustic(audio):
+    song = load('src/songs/acoustic.yml')
+    print(song)
+
+    rate = song.rate
+    instrument = song.tracks['instrument']
+    damping = instrument.damping
+    duration = instrument.vibration
+
+    tuning = list(map(parse_pitch, reversed(instrument.tuning)))
+    print(tuning)
+
+    for stroke in instrument.tabs.bars:
+        for note in stroke.notes:
+            print(note)
+
+            frets = note.frets
+            speed = note.arpeggio
+            reverse = note.stroke == 'up'
+
+            freqs = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
+            print(freqs)
+
+            buffer = build_chord(rate, duration, damping, freqs, speed, reverse)
+            play(audio, buffer, volume, rate)
+
 
 def main():
     audio = pa.PyAudio()
-    rate = 44100  # 88200
+    rate = 44100
 
     play_tone(audio, rate)
     play_tones(audio, rate)
@@ -228,8 +276,9 @@ def main():
     play_pitches(audio, rate)
     play_notations(audio, rate)
 
+    play_acoustic(audio)
+
     audio.terminate()
 
 
 main()
-
