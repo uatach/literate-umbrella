@@ -11,7 +11,12 @@ from models import load
 volume = 0.1
 
 
-def play(audio: pa.PyAudio, buffer: np.ndarray, volume: float, rate: int):
+def play(
+    audio: pa.PyAudio,
+    buffer: np.ndarray,
+    volume: float,
+    rate: int,
+):
     data = (volume * buffer.astype(np.float32)).tobytes()
 
     stream = audio.open(
@@ -177,18 +182,17 @@ def build_chord(rate, duration, damping, freqs, speed, reverse):
     if reverse:
         sounds = reversed(sounds)
 
-    return utils.normalize(utils.overlay([
-        utils.delay(x, i * speed, rate)
-        for i, x in enumerate(sounds)
-    ]))
+    return utils.normalize(
+        utils.overlay([utils.delay(x, i * speed, rate) for i, x in enumerate(sounds)])
+    )
 
 
 def play_acoustic(audio):
-    song = load('src/songs/acoustic.yml')
+    song = load("src/songs/acoustic.yml")
     print(song)
 
     rate = song.rate
-    instrument = song.tracks['instrument']
+    instrument = song.tracks["instrument"]
     damping = instrument.damping
     duration = instrument.vibration
 
@@ -201,7 +205,7 @@ def play_acoustic(audio):
 
             frets = note.frets
             speed = note.arpeggio
-            reverse = note.stroke == 'up'
+            reverse = note.stroke == "up"
 
             freqs = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
             print(freqs)
