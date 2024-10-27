@@ -2,11 +2,12 @@ import numpy as np
 import pyaudio as pa
 
 from re import fullmatch
-from itertools import cycle
 from typing import Generator
+from functools import cache
+from itertools import cycle
 
 
-volume = 0.3
+volume = 0.1
 
 rng = np.random.default_rng()
 
@@ -33,6 +34,7 @@ def vibrate(buffer: np.ndarray, damping: float) -> Generator[float, None, None]:
         buffer[i] = (c + n) * damping
 
 
+@cache
 def synthesize(
     duration: float,
     freq: float,
