@@ -129,6 +129,7 @@ def play_notes(ctx, **kwargs):
         "A1",
         "E1",
     ]
+
     for x in notes:
         play_frequency(
             **ctx.obj,
@@ -145,6 +146,19 @@ def play_file(ctx, path):
         **ctx.obj,
         path=path,
     )
+
+
+@main.command
+@click.pass_context
+def test_all(ctx):
+    ctx.invoke(play_tone, frequency=441)
+    ctx.invoke(play_tones)
+    ctx.invoke(play_sequence)
+    ctx.invoke(play_chord)
+    ctx.invoke(play_chord, reverse=True)
+    ctx.invoke(play_pitches)
+    ctx.invoke(play_notes)
+    ctx.invoke(play_file, path='src/songs/acoustic.yml')
 
 
 if __name__ == "__main__":
