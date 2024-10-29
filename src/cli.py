@@ -1,6 +1,13 @@
 import click
 
-from audio import AudioHandler, play_frequency, play_overlay
+from audio import (
+    AudioHandler,
+    change_pitch,
+    parse_pitch,
+    play_frequency,
+    play_overlay,
+    play_song,
+)
 
 
 @click.group
@@ -22,6 +29,19 @@ def play_tone(ctx, **kwargs):
         **ctx.obj,
         **kwargs,
     )
+
+
+@main.command
+@click.pass_context
+@click.option("--duration", default=1)
+@click.option("--damping", default=0.495)
+def play_tones(ctx, **kwargs):
+    for x in range(200, 610, 10):
+        play_frequency(
+            **ctx.obj,
+            **kwargs,
+            frequency=x,
+        )
 
 
 @main.command
@@ -71,6 +91,59 @@ def play_chord(ctx, **kwargs):
         **ctx.obj,
         **kwargs,
         frequencies=frequencies,
+    )
+
+
+@main.command
+@click.pass_context
+@click.option("--duration", default=0.5)
+@click.option("--damping", default=0.495)
+def play_pitches(ctx, **kwargs):
+    for x in sorted([-12, 24] + list(range(13))):
+        play_frequency(
+            **ctx.obj,
+            **kwargs,
+            frequency=change_pitch(110, x),
+        )
+
+
+@main.command
+@click.pass_context
+@click.option("--duration", default=1)
+@click.option("--damping", default=0.495)
+def play_notes(ctx, **kwargs):
+    notes = [
+        "C",
+        "C0",
+        "A#",
+        "C#4",
+        "A4",
+        "E4",
+        "B3",
+        "G3",
+        "D3",
+        "A2",
+        "E2",
+        "G2",
+        "D2",
+        "A1",
+        "E1",
+    ]
+    for x in notes:
+        play_frequency(
+            **ctx.obj,
+            **kwargs,
+            frequency=parse_pitch(x),
+        )
+
+
+@main.command
+@click.pass_context
+@click.argument("path", type=click.Path(exists=True))
+def play_file(ctx, path):
+    play_song(
+        **ctx.obj,
+        path=path,
     )
 
 
