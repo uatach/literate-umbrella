@@ -90,14 +90,14 @@ def play_overlay(
     duration: float,
     damping: float,
     volume: float,
-    speed: float,
+    delay: float,
     rate: int,
 ):
     buffer = utils.overlay(
         [
             utils.delay(
                 utils.synthesize(x, duration, rate, damping),
-                duration=speed * i,
+                duration=delay * i,
                 rate=rate,
             )
             for i, x in enumerate(frequencies)

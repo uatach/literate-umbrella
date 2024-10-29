@@ -72,7 +72,7 @@ def play_sequence(ctx, **kwargs):
 @click.pass_context
 @click.option("--duration", default=5)
 @click.option("--damping", default=0.499)
-@click.option("--speed", default=0.04)
+@click.option("--delay", default=0.04)
 @click.option("--reverse", default=False)
 def play_chord(ctx, **kwargs):
     frequencies = [
