@@ -74,3 +74,9 @@ To generate the sequence of notes:
 ```bash
 python src/cli.py play-notes
 ```
+
+To generate the sounds of the 3 instruments:
+
+```bash
+python src/cli.py play-instruments
+```

@@ -93,10 +93,13 @@ def play_overlay(
     delay: float,
     rate: int,
 ):
+    idx = list(sorted(frequencies)).index
+    step = duration * 0.1
+
     buffer = utils.overlay(
         [
             utils.delay(
-                utils.synthesize(x, duration, rate, damping),
+                utils.synthesize(x, duration - step * idx(x), rate, damping),
                 duration=delay * i,
                 rate=rate,
             )
@@ -133,14 +136,14 @@ def play_song(
             print(note)
 
             frets = note.frets
-            speed = note.arpeggio
+            delay = note.arpeggio
             reverse = note.stroke == "up"
 
             freqs = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
-            print(freqs)
 
             if reverse:
                 freqs = list(reversed(freqs))
+            print(freqs)
 
             play_overlay(
                 handler,
@@ -148,6 +151,6 @@ def play_song(
                 duration,
                 damping,
                 volume,
-                speed,
+                delay,
                 rate,
             )
