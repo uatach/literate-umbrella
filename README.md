@@ -80,3 +80,12 @@ To generate the sounds of the 3 instruments:
 ```bash
 python src/cli.py play-instruments
 ```
+
+
+## Step 5
+
+To generate the chorus of Jason Mraz's "I'm Yours":
+
+```bash
+python src/cli.py play-chorus
+```

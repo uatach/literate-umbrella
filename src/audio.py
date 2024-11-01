@@ -84,15 +84,17 @@ def play_frequency(
     )
 
 
-def play_overlay(
-    handler: AudioHandler,
+def build_chord(
     frequencies: list[float],
     duration: float,
     damping: float,
-    volume: float,
+    reverse: bool,
     delay: float,
     rate: int,
 ):
+    if reverse:
+        frequencies = list(reversed(frequencies))
+
     idx = list(sorted(frequencies)).index
     step = duration * 0.1
 
@@ -107,9 +109,46 @@ def play_overlay(
         ]
     )
 
+    return utils.normalize(buffer)
+
+
+def play_overlay(
+    handler: AudioHandler,
+    frequencies: list[float],
+    duration: float,
+    damping: float,
+    volume: float,
+    delay: float,
+    rate: int,
+):
+    buffer = build_chord(
+        frequencies,
+        duration,
+        damping,
+        False,
+        delay,
+        rate,
+    )
+
     _play(
         handler,
-        utils.normalize(buffer),
+        buffer,
+        volume,
+        rate,
+    )
+
+
+def play_chords(
+    handler: AudioHandler,
+    chords: list[tuple[np.ndarray, float]],
+    volume: float,
+    rate: int,
+):
+    buffers = [utils.delay(buffer, delay, rate) for buffer, delay in chords]
+
+    _play(
+        handler,
+        utils.normalize(utils.overlay(buffers)),
         volume,
         rate,
     )

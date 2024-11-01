@@ -1,11 +1,15 @@
 import click
 
+from itertools import cycle
+
 from audio import (
     AudioHandler,
+    build_chord,
     change_pitch,
     parse_pitch,
     play_frequency,
     play_overlay,
+    play_chords,
     play_song,
 )
 
@@ -177,6 +181,57 @@ def play_instruments(ctx, **kwargs):
 
 @main.command
 @click.pass_context
+def play_chorus(ctx):
+    frequencies = list(map(parse_pitch, reversed(["A4", "E4", "C4", "G4"])))
+    duration = 5
+    damping = 0.498
+
+    chords = [
+        (0, 0, 0, 3),
+        (0, 2, 3, 2),
+        (2, 0, 0, 0),
+        (2, 0, 1, 0),
+    ]
+
+    strokes = [
+        (0, 0.025),
+        (0, 0.025),
+        (1, 0.025),
+        (1, 0.01),
+        (0, 0.01),
+        (1, 0.025),
+    ]
+
+    chords = (
+        build_chord(
+            [change_pitch(x, y) for x, y in zip(frequencies, chord)],
+            duration,
+            damping,
+            reverse,
+            delay,
+            ctx.obj["rate"],
+        )
+        for chord in chords
+        for _ in range(2)
+        for reverse, delay in strokes
+    )
+
+    intervals = cycle([0.65, 0.45, 0.75, 0.2, 0.4, 0.25])
+
+    delayed = []
+    init = 0
+    for x, y in zip(chords, intervals):
+        delayed.append((x, init))
+        init += y
+
+    play_chords(
+        **ctx.obj,
+        chords=delayed,
+    )
+
+
+@main.command
+@click.pass_context
 @click.argument("path", type=click.Path(exists=True))
 def play_file(ctx, path):
     play_song(
@@ -196,7 +251,7 @@ def test_all(ctx):
     ctx.invoke(play_pitches)
     ctx.invoke(play_notes)
     ctx.invoke(play_instruments)
-    ctx.invoke(play_file, path='src/songs/acoustic.yml')
+    ctx.invoke(play_file, path="src/songs/acoustic.yml")
 
 
 if __name__ == "__main__":
