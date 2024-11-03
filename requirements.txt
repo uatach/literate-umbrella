@@ -1,5 +1,6 @@
 click==8.1.7
 numpy==2.0.0
+pedalboard==0.9.16
 pyaudio==0.2.14
 pydantic==2.9.2
 pyyaml==6.0.2

@@ -185,7 +185,8 @@ def play_instruments(ctx, **kwargs):
 
 @main.command
 @click.pass_context
-def play_chorus(ctx):
+@click.option("--effects", default=False)
+def play_chorus(ctx, **kwargs):
     frequencies = parse_notes("A4", "E4", "C4", "G4")
     duration = 5
     damping = 0.498
@@ -229,6 +230,7 @@ def play_chorus(ctx):
 
     play_buffers(
         **ctx.obj,
+        **kwargs,
         buffers=buffers,
     )
 

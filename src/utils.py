@@ -3,6 +3,7 @@ import numpy as np
 from typing import Generator
 from functools import cache
 from itertools import cycle
+from pedalboard import Convolution, Gain, LowShelfFilter, Pedalboard, Reverb
 
 
 rng = np.random.default_rng()
@@ -64,3 +65,24 @@ def overlay(sounds: list[np.ndarray]) -> np.ndarray:
     for x in sounds:
         buffer[: len(x)] += x
     return normalize(buffer)
+
+
+def effects(
+    buffer: np.ndarray,
+    rate: int,
+    path: str = None,
+) -> np.ndarray:
+    return normalize(
+        Pedalboard(
+            [
+                Reverb(),
+                (
+                    Convolution(impulse_response_filename=path, mix=0.95)
+                    if path is not None
+                    else None
+                ),
+                LowShelfFilter(cutoff_frequency_hz=440, gain_db=10, q=1),
+                Gain(gain_db=6),
+            ]
+        )(buffer, rate)
+    )

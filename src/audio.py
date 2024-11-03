@@ -106,10 +106,16 @@ def play_buffers(
     buffers: list[np.ndarray],
     volume: float,
     rate: int,
+    effects: bool = False,
 ):
+    buffer = utils.overlay(buffers)
+
+    if effects:
+        buffer = utils.effects(buffer, rate)
+
     _play(
         handler,
-        utils.normalize(utils.overlay(buffers)),
+        buffer,
         volume,
         rate,
     )
@@ -182,7 +188,7 @@ def play_song(
     signature = tabs.signature
 
     beat = 60 / bpm
-    measure = beat * int(signature.split('/')[0])
+    measure = beat * int(signature.split("/")[0])
 
     init = 0
     buffers = []
@@ -197,7 +203,9 @@ def play_song(
 
             position = init + offset
 
-            frequencies = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
+            frequencies = [
+                change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None
+            ]
 
             buffers.append(
                 build_chord(

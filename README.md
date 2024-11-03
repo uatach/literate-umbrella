@@ -61,7 +61,7 @@ python src/cli.py play-chord --delay 0.04 --reverse true
 ```
 
 
-## Step 4
+### Step 4
 
 To generate the sequence of pitches from the beginning of the step:
 
@@ -82,10 +82,31 @@ python src/cli.py play-instruments
 ```
 
 
-## Step 5
+### Step 5
 
 To generate the chorus of Jason Mraz's "I'm Yours":
 
 ```bash
 python src/cli.py play-chorus
 ```
+
+
+### Step 6
+
+To generate the chorus of Jason Mraz's "I'm Yours" with special effects:
+
+```bash
+python src/cli.py play-chorus --effects true
+```
+
+
+## repo stats
+
+Language|files|blank|comment|code
+:-------|-------:|-------:|-------:|-------:
+Python|4|125|1|481
+YAML|2|0|0|200
+Markdown|1|43|0|61
+Text|1|0|0|6
+--------|--------|--------|--------|--------
+SUM:|8|168|1|748

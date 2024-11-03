@@ -6,90 +6,76 @@ tracks:
     references:
       - https://realpython.com/python-guitar-synthesizer
     tuning: [E2, A2, D3, G3, B3, E4]
-    vibration: 1
+    vibration: 5
     damping: 0.498
     tabs:
-      bpm: 75
+      bpm: 60
       signature: 4/4
       bars:
         - notes:
             - frets: [0, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 0/8
             - frets: [1, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 1/8
             - frets: [2, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 2/8
             - frets: [3, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 3/8
             - frets: [4, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 4/8
             - frets: [5, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 5/8
             - frets: [6, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 6/8
             - frets: [7, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 7/8
+        - notes:
             - frets: [8, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 0/8
             - frets: [9, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 1/8
             - frets: [10, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 2/8
             - frets: [11, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 3/8
             - frets: [12, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 4/8
             - frets: [13, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 5/8
             - frets: [14, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 6/8
             - frets: [15, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 7/8
+        - notes:
             - frets: [16, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 0/8
             - frets: [17, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 1/8
             - frets: [18, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 2/8
             - frets: [19, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 3/8
             - frets: [20, ~, ~, ~, ~, ~]
-              arpeggio: 0.04
-              stroke: down
+              offset: 4/8
         - notes:
             - frets: [~, ~, 2, ~, 0, ~]
               arpeggio: 0.04
               stroke: down
+              offset: 0/8
         - notes:
             - frets: [0, 0, 0, 0, 0, 0]
               arpeggio: 0.04
               stroke: down
+              offset: 0/8
             - frets: [0, 0, 0, 0, 0, 0]
               arpeggio: 0.04
               stroke: up
+              offset: 2/8
             - frets: [0, 1, 0, 3, 0, 7]
               arpeggio: 0.04
               stroke: down
+              offset: 4/8
             - frets: [0, 1, 0, 3, 0, 7]
               arpeggio: 0.04
               stroke: up
+              offset: 6/8
