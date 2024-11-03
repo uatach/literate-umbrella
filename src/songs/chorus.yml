@@ -1,0 +1,119 @@
+title: Chorus of "I'm Yours"
+artist: Jason Mraz
+rate: 44100
+tracks:
+  instrument:
+    references:
+      - https://realpython.com/python-guitar-synthesizer
+      - https://www.youtube.com/watch?v=gafBk38hHkg
+    tuning: [A4, E4, C4, G4]
+    vibration: 5
+    damping: 0.498
+    tabs:
+      bpm: 75
+      signature: 4/4
+      bars:
+        - notes: &block1
+            - frets: &chord1 [0, 0, 0, 3]
+              arpeggio: &slow 0.025
+              stroke: down
+              offset: 5/20
+            - frets: *chord1
+              arpeggio: *slow
+              stroke: down
+              offset: 13/20
+            - frets: *chord1
+              arpeggio: *slow
+              stroke: up
+              offset: 9/20
+            - frets: *chord1
+              arpeggio: &fast 0.01
+              stroke: up
+              offset: 15/20
+            - frets: *chord1
+              arpeggio: *fast
+              stroke: down
+              offset: 4/20
+            - frets: *chord1
+              arpeggio: *slow
+              stroke: up
+              offset: 8/20
+        - notes: *block1
+        - notes: &block2
+            - frets: &chord2 [0, 2, 3, 2]
+              arpeggio: *slow
+              stroke: down
+              offset: 5/20
+            - frets: *chord2
+              arpeggio: *slow
+              stroke: down
+              offset: 13/20
+            - frets: *chord2
+              arpeggio: *slow
+              stroke: up
+              offset: 9/20
+            - frets: *chord2
+              arpeggio: *fast
+              stroke: up
+              offset: 15/20
+            - frets: *chord2
+              arpeggio: *fast
+              stroke: down
+              offset: 4/20
+            - frets: *chord2
+              arpeggio: *slow
+              stroke: up
+              offset: 8/20
+        - notes: *block2
+        - notes: &block3
+            - frets: &chord3 [2, 0, 0, 0]
+              arpeggio: *slow
+              stroke: down
+              offset: 5/20
+            - frets: *chord3
+              arpeggio: *slow
+              stroke: down
+              offset: 13/20
+            - frets: *chord3
+              arpeggio: *slow
+              stroke: up
+              offset: 9/20
+            - frets: *chord3
+              arpeggio: *fast
+              stroke: up
+              offset: 15/20
+            - frets: *chord3
+              arpeggio: *fast
+              stroke: down
+              offset: 4/20
+            - frets: *chord3
+              arpeggio: *slow
+              stroke: up
+              offset: 8/20
+        - notes: *block3
+        - notes: &block4
+            - frets: &chord4 [2, 0, 1, 0]
+              arpeggio: *slow
+              stroke: down
+              offset: 5/20
+            - frets: *chord4
+              arpeggio: *slow
+              stroke: down
+              offset: 13/20
+            - frets: *chord4
+              arpeggio: *slow
+              stroke: up
+              offset: 9/20
+            - frets: *chord4
+              arpeggio: *fast
+              stroke: up
+              offset: 15/20
+            - frets: *chord4
+              arpeggio: *fast
+              stroke: down
+              offset: 4/20
+            - frets: *chord4
+              arpeggio: *slow
+              stroke: up
+              offset: 8/20
+        - notes: *block4

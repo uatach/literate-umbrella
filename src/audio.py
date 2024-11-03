@@ -89,6 +89,7 @@ def build_chord(
     duration: float,
     damping: float,
     reverse: bool,
+    offset: float,
     delay: float,
     rate: int,
 ):
@@ -109,7 +110,7 @@ def build_chord(
         ]
     )
 
-    return utils.normalize(buffer)
+    return utils.delay(utils.normalize(buffer), offset, rate)
 
 
 def play_overlay(
@@ -117,6 +118,7 @@ def play_overlay(
     frequencies: list[float],
     duration: float,
     damping: float,
+    offset: float,
     volume: float,
     delay: float,
     rate: int,
@@ -126,6 +128,7 @@ def play_overlay(
         duration,
         damping,
         False,
+        offset,
         delay,
         rate,
     )
@@ -138,14 +141,12 @@ def play_overlay(
     )
 
 
-def play_chords(
+def play_buffers(
     handler: AudioHandler,
-    chords: list[tuple[np.ndarray, float]],
+    buffers: list[np.ndarray],
     volume: float,
     rate: int,
 ):
-    buffers = [utils.delay(buffer, delay, rate) for buffer, delay in chords]
-
     _play(
         handler,
         utils.normalize(utils.overlay(buffers)),
@@ -170,6 +171,9 @@ def play_song(
     tuning = list(map(parse_pitch, reversed(instrument.tuning)))
     print(tuning)
 
+    init = 0
+    buffers = []
+
     for stroke in instrument.tabs.bars:
         for note in stroke.notes:
             print(note)
@@ -177,19 +181,23 @@ def play_song(
             frets = note.frets
             delay = note.arpeggio
             reverse = note.stroke == "up"
+            offset = eval(note.offset)
 
-            freqs = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
+            frequencies = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
+            print(frequencies)
 
-            if reverse:
-                freqs = list(reversed(freqs))
-            print(freqs)
+            init += offset
 
-            play_overlay(
-                handler,
-                freqs,
-                duration,
-                damping,
-                volume,
-                delay,
-                rate,
+            buffers.append(
+                build_chord(
+                    frequencies,
+                    duration,
+                    damping,
+                    reverse,
+                    init,
+                    delay,
+                    rate,
+                )
             )
+
+    play_buffers(handler, buffers, volume, rate)

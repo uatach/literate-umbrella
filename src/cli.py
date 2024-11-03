@@ -9,7 +9,7 @@ from audio import (
     parse_pitch,
     play_frequency,
     play_overlay,
-    play_chords,
+    play_buffers,
     play_song,
 )
 
@@ -95,6 +95,7 @@ def play_chord(ctx, **kwargs):
         **ctx.obj,
         **kwargs,
         frequencies=frequencies,
+        offset=0,
     )
 
 
@@ -154,6 +155,7 @@ def play_instruments(ctx, **kwargs):
         duration=2.5,
         damping=0.498,
         delay=0.04,
+        offset=0,
     )
 
     frequencies = list(map(parse_pitch, ["G4", "D3", "G3", "B3", "D4"]))
@@ -165,6 +167,7 @@ def play_instruments(ctx, **kwargs):
         duration=2.5,
         damping=0.4965,
         delay=0.04,
+        offset=0,
     )
 
     frequencies = list(map(parse_pitch, ["A4", "E4", "C4", "G4"]))
@@ -176,6 +179,7 @@ def play_instruments(ctx, **kwargs):
         duration=2.5,
         damping=0.498,
         delay=0.04,
+        offset=0,
     )
 
 
@@ -194,39 +198,38 @@ def play_chorus(ctx):
     ]
 
     strokes = [
-        (0, 0.025),
-        (0, 0.025),
-        (1, 0.025),
-        (1, 0.01),
-        (0, 0.01),
-        (1, 0.025),
+        (0, 0.25, 0.025),
+        (0, 0.65, 0.025),
+        (1, 0.45, 0.025),
+        (1, 0.75, 0.01),
+        (0, 0.2, 0.01),
+        (1, 0.4, 0.025),
     ]
 
-    chords = (
-        build_chord(
-            [change_pitch(x, y) for x, y in zip(frequencies, chord)],
-            duration,
-            damping,
-            reverse,
-            delay,
-            ctx.obj["rate"],
-        )
-        for chord in chords
-        for _ in range(2)
-        for reverse, delay in strokes
-    )
-
-    intervals = cycle([0.65, 0.45, 0.75, 0.2, 0.4, 0.25])
-
-    delayed = []
     init = 0
-    for x, y in zip(chords, intervals):
-        delayed.append((x, init))
-        init += y
+    buffers = []
 
-    play_chords(
+    for chord in chords:
+        for _ in range(2):
+            for reverse, offset, delay in strokes:
+                init += offset
+
+                pitches = [change_pitch(x, y) for x, y in zip(frequencies, chord)]
+                buffers.append(
+                    build_chord(
+                        pitches,
+                        duration,
+                        damping,
+                        reverse,
+                        init,
+                        delay,
+                        ctx.obj["rate"],
+                    )
+                )
+
+    play_buffers(
         **ctx.obj,
-        chords=delayed,
+        buffers=buffers,
     )
 
 
