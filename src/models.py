@@ -24,7 +24,7 @@ class Tablature(BaseModel):
 class Instrument(BaseModel):
     tuning: list[str]
     vibration: float
-    damping: float
+    damping: Optional[float] = 0.5
     tabs: Tablature
 
 

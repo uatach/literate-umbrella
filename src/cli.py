@@ -6,7 +6,7 @@ from audio import (
     AudioHandler,
     build_chord,
     change_pitch,
-    parse_pitch,
+    parse_notes,
     play_frequency,
     play_overlay,
     play_buffers,
@@ -88,9 +88,6 @@ def play_chord(ctx, **kwargs):
         329.63,
     ]
 
-    if kwargs.pop("reverse"):
-        frequencies = list(reversed(frequencies))
-
     play_overlay(
         **ctx.obj,
         **kwargs,
@@ -139,14 +136,14 @@ def play_notes(ctx, **kwargs):
         play_frequency(
             **ctx.obj,
             **kwargs,
-            frequency=parse_pitch(x),
+            frequency=parse_notes(x),
         )
 
 
 @main.command
 @click.pass_context
 def play_instruments(ctx, **kwargs):
-    frequencies = list(map(parse_pitch, ["E2", "A2", "D3", "G3", "B3", "E4"]))
+    frequencies = parse_notes("E2", "A2", "D3", "G3", "B3", "E4")
 
     play_overlay(
         **ctx.obj,
@@ -154,11 +151,12 @@ def play_instruments(ctx, **kwargs):
         frequencies=frequencies,
         duration=2.5,
         damping=0.498,
+        reverse=True,
         delay=0.04,
         offset=0,
     )
 
-    frequencies = list(map(parse_pitch, ["G4", "D3", "G3", "B3", "D4"]))
+    frequencies = parse_notes("G4", "D3", "G3", "B3", "D4")
 
     play_overlay(
         **ctx.obj,
@@ -166,11 +164,12 @@ def play_instruments(ctx, **kwargs):
         frequencies=frequencies,
         duration=2.5,
         damping=0.4965,
+        reverse=True,
         delay=0.04,
         offset=0,
     )
 
-    frequencies = list(map(parse_pitch, ["A4", "E4", "C4", "G4"]))
+    frequencies = parse_notes("A4", "E4", "C4", "G4")
 
     play_overlay(
         **ctx.obj,
@@ -178,6 +177,7 @@ def play_instruments(ctx, **kwargs):
         frequencies=frequencies,
         duration=2.5,
         damping=0.498,
+        reverse=True,
         delay=0.04,
         offset=0,
     )
@@ -186,7 +186,7 @@ def play_instruments(ctx, **kwargs):
 @main.command
 @click.pass_context
 def play_chorus(ctx):
-    frequencies = list(map(parse_pitch, reversed(["A4", "E4", "C4", "G4"])))
+    frequencies = parse_notes("A4", "E4", "C4", "G4")
     duration = 5
     damping = 0.498
 
@@ -254,7 +254,9 @@ def test_all(ctx):
     ctx.invoke(play_pitches)
     ctx.invoke(play_notes)
     ctx.invoke(play_instruments)
+    ctx.invoke(play_chorus)
     ctx.invoke(play_file, path="src/songs/acoustic.yml")
+    ctx.invoke(play_file, path="src/songs/chorus.yml")
 
 
 if __name__ == "__main__":

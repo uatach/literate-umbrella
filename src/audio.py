@@ -16,8 +16,8 @@ def change_pitch(pitch: float, semitones: int) -> float:
     return pitch * 2 ** (semitones / 12)
 
 
-def parse_pitch(notation: str) -> float:
-    if match := fullmatch(r"([A-G]#?)(-?\d+)?", notation):
+def parse_note(value: str) -> float:
+    if match := fullmatch(r"([A-G]#?)(-?\d+)?", value):
         note = match.group(1)
         octave = int(match.group(2) or 0)
         semitones = "C C# D D# E F F# G G# A A# B".split()
@@ -25,6 +25,41 @@ def parse_pitch(notation: str) -> float:
         return change_pitch(440, index)
     else:
         raise ValueError
+
+
+def parse_notes(*notes: list[str]) -> list[float]:
+    if len(notes) == 1:
+        return parse_note(notes[0])
+    return list(map(parse_note, reversed(notes)))
+
+
+def build_chord(
+    frequencies: list[float],
+    duration: float,
+    damping: float,
+    reverse: bool,
+    offset: float,
+    delay: float,
+    rate: int,
+):
+    if reverse:
+        frequencies = list(reversed(frequencies))
+
+    idx = list(sorted(frequencies)).index
+    step = duration * 0.1
+
+    buffer = utils.overlay(
+        [
+            utils.delay(
+                utils.synthesize(x, duration - step * idx(x), rate, damping),
+                duration=delay * i,
+                rate=rate,
+            )
+            for i, x in enumerate(frequencies)
+        ]
+    )
+
+    return utils.delay(utils.normalize(buffer), offset, rate)
 
 
 class AudioHandler:
@@ -66,81 +101,6 @@ def _play(
     stream.close()
 
 
-def play_frequency(
-    handler: AudioHandler,
-    frequency: float,
-    duration: float,
-    damping: float,
-    volume: float,
-    rate: int,
-):
-    buffer = utils.synthesize(frequency, duration, rate, damping)
-
-    _play(
-        handler,
-        buffer,
-        volume,
-        rate,
-    )
-
-
-def build_chord(
-    frequencies: list[float],
-    duration: float,
-    damping: float,
-    reverse: bool,
-    offset: float,
-    delay: float,
-    rate: int,
-):
-    if reverse:
-        frequencies = list(reversed(frequencies))
-
-    idx = list(sorted(frequencies)).index
-    step = duration * 0.1
-
-    buffer = utils.overlay(
-        [
-            utils.delay(
-                utils.synthesize(x, duration - step * idx(x), rate, damping),
-                duration=delay * i,
-                rate=rate,
-            )
-            for i, x in enumerate(frequencies)
-        ]
-    )
-
-    return utils.delay(utils.normalize(buffer), offset, rate)
-
-
-def play_overlay(
-    handler: AudioHandler,
-    frequencies: list[float],
-    duration: float,
-    damping: float,
-    offset: float,
-    volume: float,
-    delay: float,
-    rate: int,
-):
-    buffer = build_chord(
-        frequencies,
-        duration,
-        damping,
-        False,
-        offset,
-        delay,
-        rate,
-    )
-
-    _play(
-        handler,
-        buffer,
-        volume,
-        rate,
-    )
-
-
 def play_buffers(
     handler: AudioHandler,
     buffers: list[np.ndarray],
@@ -155,6 +115,53 @@ def play_buffers(
     )
 
 
+def play_frequency(
+    handler: AudioHandler,
+    frequency: float,
+    duration: float,
+    damping: float,
+    volume: float,
+    rate: int,
+):
+    buffer = utils.synthesize(frequency, duration, rate, damping)
+
+    play_buffers(
+        handler,
+        [buffer],
+        volume,
+        rate,
+    )
+
+
+def play_overlay(
+    handler: AudioHandler,
+    frequencies: list[float],
+    duration: float,
+    damping: float,
+    reverse: bool,
+    offset: float,
+    volume: float,
+    delay: float,
+    rate: int,
+):
+    buffer = build_chord(
+        frequencies,
+        duration,
+        damping,
+        reverse,
+        offset,
+        delay,
+        rate,
+    )
+
+    play_buffers(
+        handler,
+        [buffer],
+        volume,
+        rate,
+    )
+
+
 def play_song(
     handler: AudioHandler,
     volume: float,
@@ -162,21 +169,18 @@ def play_song(
     path: Path,
 ):
     song = load(path)
-    print(song)
 
     instrument = song.tracks["instrument"]
     damping = instrument.damping
     duration = instrument.vibration
 
-    tuning = list(map(parse_pitch, reversed(instrument.tuning)))
-    print(tuning)
+    tuning = parse_notes(*instrument.tuning)
 
     init = 0
     buffers = []
 
     for stroke in instrument.tabs.bars:
         for note in stroke.notes:
-            print(note)
 
             frets = note.frets
             delay = note.arpeggio
@@ -184,7 +188,6 @@ def play_song(
             offset = eval(note.offset)
 
             frequencies = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
-            print(frequencies)
 
             init += offset
 
