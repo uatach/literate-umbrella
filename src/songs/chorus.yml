@@ -10,110 +10,110 @@ tracks:
     vibration: 5
     damping: 0.498
     tabs:
-      bpm: 75
+      bpm: 89
       signature: 4/4
       bars:
         - notes: &block1
             - frets: &chord1 [0, 0, 0, 3]
               arpeggio: &slow 0.025
               stroke: down
-              offset: 5/20
+              offset: &offset1 0/128
             - frets: *chord1
               arpeggio: *slow
               stroke: down
-              offset: 13/20
+              offset: &offset2 31/128
             - frets: *chord1
               arpeggio: *slow
               stroke: up
-              offset: 9/20
+              offset: &offset3 52/128
             - frets: *chord1
               arpeggio: &fast 0.01
               stroke: up
-              offset: 15/20
+              offset: &offset4 88/128
             - frets: *chord1
               arpeggio: *fast
               stroke: down
-              offset: 4/20
+              offset: &offset5 97/128
             - frets: *chord1
               arpeggio: *slow
               stroke: up
-              offset: 8/20
+              offset: &offset6 117/128
         - notes: *block1
         - notes: &block2
             - frets: &chord2 [0, 2, 3, 2]
               arpeggio: *slow
               stroke: down
-              offset: 5/20
+              offset: *offset1
             - frets: *chord2
               arpeggio: *slow
               stroke: down
-              offset: 13/20
+              offset: *offset2
             - frets: *chord2
               arpeggio: *slow
               stroke: up
-              offset: 9/20
+              offset: *offset3
             - frets: *chord2
               arpeggio: *fast
               stroke: up
-              offset: 15/20
+              offset: *offset4
             - frets: *chord2
               arpeggio: *fast
               stroke: down
-              offset: 4/20
+              offset: *offset5
             - frets: *chord2
               arpeggio: *slow
               stroke: up
-              offset: 8/20
+              offset: *offset6
         - notes: *block2
         - notes: &block3
             - frets: &chord3 [2, 0, 0, 0]
               arpeggio: *slow
               stroke: down
-              offset: 5/20
+              offset: *offset1
             - frets: *chord3
               arpeggio: *slow
               stroke: down
-              offset: 13/20
+              offset: *offset2
             - frets: *chord3
               arpeggio: *slow
               stroke: up
-              offset: 9/20
+              offset: *offset3
             - frets: *chord3
               arpeggio: *fast
               stroke: up
-              offset: 15/20
+              offset: *offset4
             - frets: *chord3
               arpeggio: *fast
               stroke: down
-              offset: 4/20
+              offset: *offset5
             - frets: *chord3
               arpeggio: *slow
               stroke: up
-              offset: 8/20
+              offset: *offset6
         - notes: *block3
         - notes: &block4
             - frets: &chord4 [2, 0, 1, 0]
               arpeggio: *slow
               stroke: down
-              offset: 5/20
+              offset: *offset1
             - frets: *chord4
               arpeggio: *slow
               stroke: down
-              offset: 13/20
+              offset: *offset2
             - frets: *chord4
               arpeggio: *slow
               stroke: up
-              offset: 9/20
+              offset: *offset3
             - frets: *chord4
               arpeggio: *fast
               stroke: up
-              offset: 15/20
+              offset: *offset4
             - frets: *chord4
               arpeggio: *fast
               stroke: down
-              offset: 4/20
+              offset: *offset5
             - frets: *chord4
               arpeggio: *slow
               stroke: up
-              offset: 8/20
+              offset: *offset6
         - notes: *block4

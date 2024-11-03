@@ -6,9 +6,9 @@ from pydantic import BaseModel
 
 class Note(BaseModel):
     frets: list[Optional[int]]
-    arpeggio: Optional[float] = 0.005
+    arpeggio: Optional[float] = 0
     stroke: Optional[str] = 'down'
-    offset: Optional[str] = '1'
+    offset: Optional[str] = '0'
 
 
 class Measure(BaseModel):

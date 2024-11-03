@@ -176,20 +176,28 @@ def play_song(
 
     tuning = parse_notes(*instrument.tuning)
 
+    tabs = instrument.tabs
+
+    bpm = tabs.bpm
+    signature = tabs.signature
+
+    beat = 60 / bpm
+    measure = beat * int(signature.split('/')[0])
+
     init = 0
     buffers = []
 
-    for stroke in instrument.tabs.bars:
+    for stroke in tabs.bars:
         for note in stroke.notes:
 
             frets = note.frets
             delay = note.arpeggio
             reverse = note.stroke == "up"
-            offset = eval(note.offset)
+            offset = eval(note.offset) * measure
+
+            position = init + offset
 
             frequencies = [change_pitch(x, y) for x, y in zip(tuning, frets) if y is not None]
-
-            init += offset
 
             buffers.append(
                 build_chord(
@@ -197,10 +205,12 @@ def play_song(
                     duration,
                     damping,
                     reverse,
-                    init,
+                    position,
                     delay,
                     rate,
                 )
             )
+
+        init += measure
 
     play_buffers(handler, buffers, volume, rate)
